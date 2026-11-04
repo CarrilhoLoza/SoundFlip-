@@ -1,0 +1,48 @@
+TROCASOM | PACOTE COMPLETO 4.0
+
+INSTALAR DO ZERO
+1. Extraia todo o ZIP. Nao execute de dentro do ZIP.
+2. Execute Instalar.bat, sem administrador, e confirme.
+3. Se solicitado, revise e confirme a instalacao de NuGet/AudioDeviceCmdlets.
+4. Escolha duas saidas reais e um atalho. Clique em Salvar.
+5. O programa fica apenas no icone perto do relogio.
+
+ARQUIVOS PRINCIPAIS
+Instalar.bat: instalar ou reinstalar.
+Iniciar.bat: iniciar manualmente.
+Configurar.bat: abrir configuracoes, mesmo com o app ja rodando.
+Desinstalar.bat: confirmar e remover aplicativo e configuracao.
+scripts/: todos os arquivos PowerShell.
+assets/: icone personalizado.
+
+RECURSOS
+Padrao Ctrl+Alt+S, editavel para Ctrl/Alt/Shift + A-Z, 0-9, F1-F11.
+Uma unica acao global: alternar entre duas saidas.
+Nomes reais, icone personalizado e configuracoes salvas.
+Botao direito no icone: Configuracoes ou Sair. Duplo clique abre configuracoes.
+Atualizar saidas reabre a tela com a lista atual de dispositivos.
+Se um atalho estiver ocupado, a tela nao aceita a troca.
+Ao entrar no Windows, inicia em segundo plano. Nao e servico nativo.
+A troca pode alterar tambem a saida padrao de comunicacao; nao muda microfones.
+Aplicativos com saida fixa propria podem nao seguir o padrao.
+
+INSTALACAO
+Copia para LocalAppData/TrocaSom, cria atalhos no menu Iniciar e na pasta Inicializar.
+Voce pode apagar a pasta extraida depois de instalar; o menu Iniciar permite
+iniciar, configurar e desinstalar sem depender do ZIP.
+Instalador/desinstalador tentam encerrar a instancia desta versao com seguranca.
+Se a configuracao estiver aberta, feche-a quando solicitado.
+Se houver versao antiga rodando, saia manualmente antes de instalar.
+Nao atualiza migrando preferencias de versoes antigas. Esta e instalacao completa.
+
+DESINSTALAR
+Execute Desinstalar.bat ou Desinstalar TrocaSom no menu Iniciar.
+Apos confirmar, remove pasta instalada inteira, configuracoes e atalhos.
+A pasta extraida do ZIP nao e apagada. AudioDeviceCmdlets e mantido por ser
+dependencia compartilhada. Politicas corporativas podem bloquear scripts.
+ExecutionPolicy Bypass e usado so no processo, sem alterar a politica permanente.
+
+VALIDACAO
+Pacote gerado em ambiente sem Windows; a execucao desta versao ainda precisa
+ser validada no seu computador.
+Dependencia: https://github.com/frgnca/AudioDeviceCmdlets
