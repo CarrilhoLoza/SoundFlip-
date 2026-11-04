@@ -31,11 +31,59 @@ public class SoundKeys : NativeWindow, IDisposable {
   if(active!=0)UnregisterHotKey(Handle,active);
   active=next;mods=m;key=k;return true;
  }
+ public void Suspend(){if(active!=0){UnregisterHotKey(Handle,active);active=0;}}
+ public bool Resume(){return key!=0 && Bind(mods,key);}
  protected override void WndProc(ref Message msg){
-  if(msg.Msg==0x0312 && msg.WParam.ToInt32()==active && Pressed!=null)Pressed();
+  if(active!=0 && msg.Msg==0x0312 && msg.WParam.ToInt32()==active && Pressed!=null)Pressed();
   base.WndProc(ref msg);
  }
- public void Dispose(){if(Handle!=IntPtr.Zero){if(active!=0)UnregisterHotKey(Handle,active);DestroyHandle();}}
+ public void Dispose(){if(Handle!=IntPtr.Zero){Suspend();DestroyHandle();}}
+}
+public class ShortcutCapture : TextBox {
+ public int ShortcutModifiers {get;private set;}
+ public int ShortcutKey {get;private set;}
+ public bool HasShortcut {get;private set;}
+ int previousModifiers,previousKey;bool previousValid;
+ public ShortcutCapture(){ReadOnly=true;ShortcutsEnabled=false;TextAlign=HorizontalAlignment.Center;}
+ public void SetShortcut(int m,int k){ShortcutModifiers=m;ShortcutKey=k;HasShortcut=true;ShowShortcut();}
+ void ShowShortcut(){
+  string s="";
+  if((ShortcutModifiers&2)!=0)s+="Ctrl + ";
+  if((ShortcutModifiers&1)!=0)s+="Alt + ";
+  if((ShortcutModifiers&4)!=0)s+="Shift + ";
+  s+=ShortcutKey>=112 ? "F"+(ShortcutKey-111) : ((char)ShortcutKey).ToString();
+  Text=s;
+ }
+ protected override void OnEnter(EventArgs e){
+  previousModifiers=ShortcutModifiers;previousKey=ShortcutKey;previousValid=HasShortcut;
+  base.OnEnter(e);Text="Pressione o atalho desejado...";
+ }
+ protected override void OnLeave(EventArgs e){if(HasShortcut)ShowShortcut();base.OnLeave(e);}
+ bool Capture(Keys data){
+  int k=(int)(data&Keys.KeyCode);
+  if(k==(int)Keys.Tab)return false;
+  if(k==(int)Keys.Escape){
+   ShortcutModifiers=previousModifiers;ShortcutKey=previousKey;HasShortcut=previousValid;
+   if(HasShortcut)ShowShortcut();else Text="Clique e pressione um atalho";
+   return true;
+  }
+  if(k==16 || k==17 || k==18 || (k>=160 && k<=165))return true;
+  int m=0;
+  if((data&Keys.Control)!=0)m|=2;
+  if((data&Keys.Alt)!=0)m|=1;
+  if((data&Keys.Shift)!=0)m|=4;
+  if(m==0 || !((k>=65 && k<=90)||(k>=48 && k<=57)||(k>=112 && k<=122))){
+   HasShortcut=false;Text="Use Ctrl, Alt ou Shift + letra, numero ou F1-F11";return true;
+  }
+  ShortcutModifiers=m;ShortcutKey=k;HasShortcut=true;ShowShortcut();return true;
+ }
+ protected override bool ProcessCmdKey(ref Message msg,Keys data){
+  if(Capture(data))return true;return base.ProcessCmdKey(ref msg,data);
+ }
+ protected override void OnKeyDown(KeyEventArgs e){
+  if(Capture(e.KeyData)){e.Handled=true;e.SuppressKeyPress=true;}else base.OnKeyDown(e);
+ }
+ protected override void OnKeyPress(KeyPressEventArgs e){e.Handled=true;}
 }
 "@
 $script:state=@{Ids=@();Modifiers=3;Key=83}
@@ -63,7 +111,7 @@ function Update-Tooltip{
 }
 function Show-Settings{
  if($script:busy){return};$script:busy=$true
- $f=$null
+ $f=$null;$again=$false
  try{
   $devices=@(Get-AudioDevice -List|Where-Object {$_.Type -eq 'Playback'})
   $f=New-Object Windows.Forms.Form
@@ -84,16 +132,15 @@ function Show-Settings{
    $boxes+=$c;$f.Controls.Add($c)
   }
   $l=New-Object Windows.Forms.Label;$l.Text='Atalho para alternar';$l.SetBounds(24,192,540,24);$f.Controls.Add($l)
-  $checks=@()
-  $names=@('Ctrl','Alt','Shift');$masks=@(2,1,4)
-  foreach($i in 0,1,2){
-   $c=New-Object Windows.Forms.CheckBox;$c.Text=$names[$i];$c.SetBounds((24+$i*85),222,80,28)
-   $c.Checked=($script:state.Modifiers -band $masks[$i]) -ne 0;$checks+=$c;$f.Controls.Add($c)
-  }
-  $keys=New-Object Windows.Forms.ComboBox;$keys.DropDownStyle='DropDownList';$keys.SetBounds(300,222,130,28)
-  foreach($k in $codes){$name=if($k -ge 112){'F'+($k-111)}else{[string][char]$k};[void]$keys.Items.Add($name)}
-  $keys.SelectedIndex=[Array]::IndexOf($codes,[int]$script:state.Key);$f.Controls.Add($keys)
-  $hint=New-Object Windows.Forms.Label;$hint.Text='Escolha ao menos um modificador. Ex.: Ctrl + Alt + S.'
+  $capture=New-Object ShortcutCapture
+  $capture.SetBounds(24,222,540,30)
+  $capture.SetShortcut([int]$script:state.Modifiers,[int]$script:state.Key)
+  $capture.BackColor=[Drawing.Color]::White
+  $capture.Add_Enter({$hot.Suspend()})
+  $capture.Add_Leave({$script:bound=$hot.Resume()})
+  $f.Controls.Add($capture)
+  $hint=New-Object Windows.Forms.Label
+  $hint.Text='Clique no campo e pressione o atalho. Esc cancela; Tab sai.'
   $hint.SetBounds(24,263,540,27);$f.Controls.Add($hint)
   $save=New-Object Windows.Forms.Button;$save.Text='Salvar';$save.SetBounds(428,309,136,36)
   $save.BackColor=[Drawing.Color]::FromArgb(30,116,133);$save.ForeColor=[Drawing.Color]::White;$save.FlatStyle='Flat'
@@ -101,9 +148,8 @@ function Show-Settings{
    if($boxes[0].SelectedIndex -lt 0 -or $boxes[1].SelectedIndex -lt 0){[void][Windows.Forms.MessageBox]::Show('Conecte duas saídas de áudio.');return}
    $ids=@($devices[$boxes[0].SelectedIndex].ID,$devices[$boxes[1].SelectedIndex].ID)
    if($ids[0] -eq $ids[1]){[void][Windows.Forms.MessageBox]::Show('Escolha duas saídas diferentes.');return}
-   $m=0;foreach($i in 0,1,2){if($checks[$i].Checked){$m=$m -bor $masks[$i]}}
-   if(!$m -or $keys.SelectedIndex -lt 0){[void][Windows.Forms.MessageBox]::Show('Escolha um modificador e uma tecla.');return}
-   $k=[int]$codes[$keys.SelectedIndex]
+   if(!$capture.HasShortcut){[void][Windows.Forms.MessageBox]::Show('Clique no campo e pressione Ctrl, Alt ou Shift junto de uma letra, número ou F1-F11.');return}
+   $m=[int]$capture.ShortcutModifiers;$k=[int]$capture.ShortcutKey
    if(!$hot.Bind([uint32]$m,[uint32]$k)){[void][Windows.Forms.MessageBox]::Show('Atalho indisponível. Escolha outra combinação. O anterior foi mantido.');return}
    try{
     $next=@{Ids=$ids;Modifiers=$m;Key=$k}
@@ -111,7 +157,7 @@ function Show-Settings{
     Move-Item -LiteralPath ($config+'.tmp') -Destination $config -Force
     $script:state=$next;$script:bound=$true;Update-Tooltip;$f.Close()
    }catch{
-    [void]$hot.Bind([uint32]$script:state.Modifiers,[uint32]$script:state.Key)
+    $script:bound=$hot.Bind([uint32]$script:state.Modifiers,[uint32]$script:state.Key)
     [void][Windows.Forms.MessageBox]::Show($_.Exception.Message,'Erro ao salvar')
    }
   })
@@ -120,7 +166,11 @@ function Show-Settings{
   $refresh.Add_Click({$f.Tag='refresh';$f.Close()});$f.Controls.Add($refresh)
   [void]$f.ShowDialog();$again=$f.Tag -eq 'refresh'
  }catch{[void][Windows.Forms.MessageBox]::Show($_.Exception.Message,'TrocaSom')}
- finally{if($f){$f.Dispose()};$script:busy=$false}
+ finally{
+  if($f){$f.Dispose()}
+  $script:bound=$hot.Bind([uint32]$script:state.Modifiers,[uint32]$script:state.Key)
+  $script:busy=$false
+ }
  if($again){Show-Settings}
 }
 $context=New-Object Windows.Forms.ApplicationContext
