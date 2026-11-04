@@ -1,4 +1,4 @@
-# 🎧 TrocaSom
+# 🎧 Sound Flip
 
 Alterne entre duas saídas de áudio do Windows usando um atalho de teclado personalizável, sem precisar manter uma janela aberta.
 
