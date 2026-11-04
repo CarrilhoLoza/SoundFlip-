@@ -1,3 +1,6 @@
+> [!WARNING]
+> Este projeto foi desenvolvido 100% por inteligência artificial, a partir das instruções do autor. O código do aplicativo, a documentação e o ícone foram gerados por IA; as decisões e os testes manuais foram conduzidos pelo autor. Dependências de terceiros, como AudioDeviceCmdlets, não fazem parte dessa autoria. Revise o código e valide o funcionamento no seu computador antes de usar.
+
 # 🎧 SoundFlip
 
 Alterne entre duas saídas de áudio do Windows usando um atalho de teclado personalizável, sem precisar manter uma janela aberta.
