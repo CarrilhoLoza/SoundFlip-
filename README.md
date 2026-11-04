@@ -2,7 +2,7 @@
 
 Alterne entre duas saídas de áudio do Windows usando um atalho de teclado personalizável, sem precisar manter uma janela aberta.
 
-> Este manual acompanha o pacote completo do TrocaSom apresentado neste projeto. O aplicativo funciona em segundo plano na sessão do usuário; não é um serviço nem um componente nativo do Windows.
+> Este manual acompanha o pacote completo do Sound Flip apresentado neste projeto. O aplicativo funciona em segundo plano na sessão do usuário; não é um serviço nem um componente nativo do Windows.
 
 ## Índice
 
@@ -160,7 +160,7 @@ A tecla Windows, `F12`, teclas de mídia e combinações sem modificadores não 
 
 ## Inicialização automática
 
-O instalador configura o TrocaSom para iniciar quando você entra na sua conta do Windows.
+O instalador configura o Sound Flip para iniciar quando você entra na sua conta do Windows.
 
 - Não inicia antes do login.
 - Não instala um serviço do Windows.
@@ -173,7 +173,7 @@ Para conferir o atalho de inicialização:
 2. Digite `shell:startup`.
 3. Localize `TrocaSom.lnk`.
 
-Para impedir a inicialização automática sem remover o aplicativo, exclua apenas esse atalho. Você ainda pode iniciar o TrocaSom pelo menu Iniciar. Uma reinstalação cria o atalho novamente.
+Para impedir a inicialização automática sem remover o aplicativo, exclua apenas esse atalho. Você ainda pode iniciar o Sound Flip pelo menu Iniciar. Uma reinstalação cria o atalho novamente.
 
 ## Desinstalação
 
@@ -200,13 +200,13 @@ Depois:
 - A pasta na qual você extraiu o ZIP.
 - O módulo `AudioDeviceCmdlets`, pois pode ser utilizado por outros scripts ou programas.
 
-> Não guarde arquivos pessoais dentro da pasta instalada do TrocaSom: o desinstalador remove essa pasta inteira.
+> Não guarde arquivos pessoais dentro da pasta instalada do Sound Flip: o desinstalador remove essa pasta inteira.
 
 ## Solução de problemas
 
 ### O nome do dispositivo não aparece na lista
 
-Verifique se o dispositivo está conectado e reconhecido nas configurações de som do Windows. Depois, abra as configurações do TrocaSom e clique em **Atualizar saídas**.
+Verifique se o dispositivo está conectado e reconhecido nas configurações de som do Windows. Depois, abra as configurações do Sound Flip e clique em **Atualizar saídas**.
 
 ### Só consigo selecionar uma saída
 
@@ -214,13 +214,13 @@ Conecte ou habilite uma segunda saída no Windows e atualize a lista. O programa
 
 ### O atalho está indisponível
 
-Escolha outra combinação. Se uma versão antiga do TrocaSom ainda estiver aberta, encerre-a primeiro. Outra aplicação também pode estar usando o mesmo atalho.
+Escolha outra combinação. Se uma versão antiga do Sound Flip ainda estiver aberta, encerre-a primeiro. Outra aplicação também pode estar usando o mesmo atalho.
 
 Se uma combinação salva estiver ocupada ao iniciar o aplicativo, a tela de configuração é aberta para que você escolha outra.
 
 ### O atalho não faz nada
 
-1. Confira se o ícone do TrocaSom está perto do relógio ou na área de ícones ocultos.
+1. Confira se o ícone do Sound Flip está perto do relógio ou na área de ícones ocultos.
 2. Se não estiver, inicie pelo menu Iniciar.
 3. Abra as configurações e confira o atalho e os dois dispositivos salvos.
 4. Se necessário, teste outra combinação.
@@ -231,7 +231,7 @@ Reconecte o dispositivo ou escolha outra saída nas configurações. O aplicativ
 
 ### O áudio de um jogo ou aplicativo não mudou
 
-O TrocaSom altera a saída padrão do Windows. Ele não implementa redirecionamento individual de áudio por aplicativo. Confira se o programa em questão está configurado para seguir a saída padrão, em vez de usar um dispositivo fixo.
+O Sound Flip altera a saída padrão do Windows. Ele não implementa redirecionamento individual de áudio por aplicativo. Confira se o programa em questão está configurado para seguir a saída padrão, em vez de usar um dispositivo fixo.
 
 ### Não consigo instalar a dependência
 
@@ -283,7 +283,7 @@ O projeto utiliza **AudioDeviceCmdlets**, mantido separadamente:
 - Código-fonte e documentação: <https://github.com/frgnca/AudioDeviceCmdlets>
 - Repositório usado pelo instalador: PSGallery.
 
-Consulte a documentação e a licença dessa dependência antes de redistribuí-la. O pacote do TrocaSom solicita sua instalação; não inclui o módulo dentro do ZIP.
+Consulte a documentação e a licença dessa dependência antes de redistribuí-la. O pacote do Sound Flip solicita sua instalação; não inclui o módulo dentro do ZIP.
 
 ## Distribuição e limitações
 
