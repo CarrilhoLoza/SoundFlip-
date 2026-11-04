@@ -59,7 +59,7 @@ public class ShortcutCapture : TextBox {
   base.OnEnter(e);Text="Pressione o atalho desejado...";
  }
  protected override void OnLeave(EventArgs e){if(HasShortcut)ShowShortcut();base.OnLeave(e);}
- bool Capture(Keys data){
+ bool TryCaptureShortcut(Keys data){
   int k=(int)(data&Keys.KeyCode);
   if(k==(int)Keys.Tab)return false;
   if(k==(int)Keys.Escape){
@@ -78,10 +78,10 @@ public class ShortcutCapture : TextBox {
   ShortcutModifiers=m;ShortcutKey=k;HasShortcut=true;ShowShortcut();return true;
  }
  protected override bool ProcessCmdKey(ref Message msg,Keys data){
-  if(Capture(data))return true;return base.ProcessCmdKey(ref msg,data);
+  if(TryCaptureShortcut(data))return true;return base.ProcessCmdKey(ref msg,data);
  }
  protected override void OnKeyDown(KeyEventArgs e){
-  if(Capture(e.KeyData)){e.Handled=true;e.SuppressKeyPress=true;}else base.OnKeyDown(e);
+  if(TryCaptureShortcut(e.KeyData)){e.Handled=true;e.SuppressKeyPress=true;}else base.OnKeyDown(e);
  }
  protected override void OnKeyPress(KeyPressEventArgs e){e.Handled=true;}
 }
